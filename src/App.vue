@@ -52,6 +52,30 @@
     <button class="my-4 px-5 py-2.5 rounded-lg bg-rose-500" @click="getNewName()">Click to generate name</button>
     <p v-if="author">{{ author }}</p>
   </div>
+
+  <div class="container mx-auto">
+    <h1 class="text-2xl font-bold text-center my-8">Methods vs computed props vs watchers</h1>
+    <div class="grid sm:grid-cols-3">
+      <div>
+        <input type="text" v-model="input" placeholder="Search with method" class="bg-gray-50 border border-gray-500" @keyup="searchMethod">
+        <ul>
+          <li v-for="(item, index) in methodFilterList" :key="index">{{ item }}</li>
+        </ul>
+      </div>
+      <div>
+        <input type="text" v-model="input2" placeholder="Search with computed" class="bg-gray-50 border border-gray-500" @keyup="searchMethod">
+        <ul>
+          <li v-for="(item, index) in computedList" :key="index">{{ item }}</li>
+        </ul>
+      </div>
+      <div>
+        <input type="text" v-model="input3" placeholder="Search with watcher" class="bg-gray-50 border border-gray-500" @keyup="searchMethod">
+        <ul>
+          <li v-for="(item, index) in watchFilterList" :key="index">{{ item }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -103,6 +127,22 @@ export default {
       loading: false,
       data: {},
       author: "",
+      // Shared
+      frameworkList: [
+        "Vue",
+        "React",
+        "Backbone",
+        "Ember",
+        "Knockout",
+        "jQuery",
+        "Angular",
+      ],
+      // Method
+      input: "",
+      methodFilterList: [""],
+      input2: "",
+      input3: "",
+      watchFilterList: [""]
     }
   },
   watch: {
@@ -120,7 +160,16 @@ export default {
     data: function (newValue, oldValue) {
       this.author = newValue.first
       alert(`Name changed from ${oldValue.first} to ${newValue.first}`)
+    },
+    input3: {
+      handler() {
+        this.watchFilterList = this.frameworkList.filter(item => item.toLowerCase().includes(this.input3.toLowerCase()))
+      },
+      immediate: true
     }
+  },
+  created() {
+    this.searchMethod()
   },
   methods: {
     updateDiscount() {
@@ -142,6 +191,9 @@ export default {
     },
     async getNewName() {
       await fetch("https://randomuser.me/api").then(response => response.json()).then(data => this.data = data.results[0].name)
+    },
+    searchMethod() {
+      this.methodFilterList = this.frameworkList.filter(item => item.toLowerCase().includes(this.input.toLowerCase()))
     }
   },
   computed: {
@@ -173,6 +225,9 @@ export default {
     },
     fullname() {
       return `${this.firstName} ${this.lastName}`
+    },
+    computedList() {
+      return this.frameworkList.filter(item => item.toLowerCase().includes(this.input2.toLowerCase()))
     }
   }
 }
